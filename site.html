@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#FF0000">
+    <title>REDE THALE</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #FF0000;
+            color: #fff;
+            text-align: center;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+        }
+        nav {
+            background-color: #FFC107;
+            padding: 0.75rem;
+            text-align: center;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        }
+        nav a {
+            color: #FF0000;
+            margin: 0 1.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.6rem 1.2rem;
+            transition: color 0.3s, background-color 0.3s;
+            border-radius: 4px;
+        }
+        nav a:hover {
+            color: #fff;
+            background-color: #FF0000;
+            text-decoration: none;
+        }
+        .menu-toggle {
+            display: none;
+            font-size: 2rem;
+            background: none;
+            border: none;
+            color: #FF0000;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        @media (max-width: 600px) {
+            .menu-toggle {
+                display: block;
+            }
+            nav a {
+                display: none;
+            }
+            nav.responsive a {
+                display: block;
+                margin: 0.75rem 0;
+                padding: 0.6rem;
+                background-color: #fff;
+                border-radius: 4px;
+            }
+        }
+        section {
+            display: none;
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 1rem auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s;
+            flex: 1;
+        }
+        section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .login-form {
+            max-width: 500px;
+            padding: 2rem;
+        }
+        input, textarea, button {
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        button {
+            background-color: #FF0000;
+            color: #FFC107;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #cc0000;
+        }
+        .estoque-card {
+            display: inline-block;
+            width: 300px;
+            height: 400px;
+            margin: 1.5rem;
+            background-color: #fff;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            text-align: center;
+            vertical-align: top;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .estoque-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .estoque-card.baixo-estoque {
+            border-color: #FF0000;
+        }
+        .estoque-card img {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+        .estoque-card p {
+            margin: 0.8rem 0;
+            font-size: 1.1rem;
+            color: #444;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            min-height: 500px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            position: relative;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: 0 auto;
+            animation: slideIn 0.3s;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .close {
+            position: relative;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.5rem;
+            color: #000;
+            border: none;
+            background: none;
+            cursor: pointer;
+            padding: 0.3rem 0.6rem;
+            margin-top: 1rem;
+            transition: color 0.3s;
+        }
+        .close:hover {
+            color: #555;
+        }
+        .modal-content h3 {
+            color: #FF0000;
+            margin-top: 0;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            padding-left: 1rem;
+        }
+        .modal-content img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .modal-content .detalhes-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            padding: 0 1rem;
+        }
+        .modal-content .detalhes-row p {
+            margin: 0;
+            font-size: 1rem;
+            color: #555;
+        }
+        .modal-content input {
+            margin: 0.5rem 0;
+            padding: 0.6rem;
+        }
+        .modal-content .edit-button {
+            margin-top: 1rem;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+        }
+        .modal-content .delete-button {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        .mensagem {
+            padding: 0.8rem;
+            margin-top: 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .mensagem.sucesso {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .mensagem.erro {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background-color: #fff;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.8rem;
+            text-align: left;
+            color: #444;
+        }
+        th {
+            background-color: #FFC107;
+            color: #FF0000;
+            font-weight: 700;
+        }
+        .estoque-total, .estoque-detalhes {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .estoque-total h3, .estoque-detalhes h3 {
+            color: #FF0000;
+            margin: 0 0 0.5rem;
+        }
+        .estoque-total p, .estoque-detalhes p {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #444;
+            font-weight: 600;
+        }
+        .estoque-detalhes ul {
+            list-style: none;
+            padding: 0;
+            margin: 0.5rem 0;
+        }
+        .estoque-detalhes li {
+            margin: 0.5rem 0;
+        }
+        .estoque-detalhes li strong {
+            font-weight: bold;
+        }
+        @media (max-width: 600px) {
+            .estoque-card {
+                width: 240px;
+                height: 320px;
+            }
+            .estoque-card img {
+                width: 240px;
+                height: 240px;
+            }
+            .modal-content {
+                margin: 10% auto;
+                padding: 1rem;
+                max-width: 300px;
+                min-height: 400px;
+                width: 85%;
+            }
+            .modal-content img {
+                max-width: 150px;
+            }
+            .modal-content .detalhes-row {
+                flex-direction: column;
+                text-align: left;
+            }
+            .login-form {
+                padding: 1.5rem;
+            }
+            table {
+                font-size: 0.9rem;
+            }
+            th, td {
+                padding: 0.5rem;
+            }
+            input, textarea, button {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Seção de Login -->
+    <header>
+        <h1>REDE THALE</h1>
+    </header>
+    <section id="login" class="active">
+        <form id="loginForm" class="login-form">
+            <input type="text" id="username" placeholder="Usuário" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <label><input type="checkbox" id="saveUsername"> Lembrar Usuário</label>
+            <button type="submit">Entrar</button>
+        </form>
+        <div id="mensagemLogin" class="mensagem"></div>
+    </section>
+
+    <!-- Menu Principal -->
+    <nav id="menu" style="display: none;">
+        <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+        <a onclick="mostrarSecao('estoque')">Estoque</a>
+        <a onclick="mostrarSecao('cadastro')">Cadastro</a>
+        <a onclick="mostrarSecao('historico')">Histórico</a>
+        <a onclick="logout()">Sair</a>
+    </nav>
+
+    <!-- Seção de Cadastro -->
+    <section id="cadastro">
+        <h2>Cadastrar Produto</h2>
+        <form id="cadastroForm">
+            <input type="text" id="nome" placeholder="Nome do Produto" required>
+            <input type="number" id="preco" placeholder="Preço" step="0.01" min="0" required oninput="formatarPreco(this)" onblur="this.value = (parseFloat(this.value) || 0).toFixed(2).replace('.', ',')">
+            <input type="number" id="quantidade" placeholder="Quantidade" min="1" required>
+            <input type="number" id="estoqueMinimo" placeholder="Estoque Mínimo" min="0" required>
+            <textarea id="descricao" placeholder="Descrição" required></textarea>
+            <input type="file" id="imagem" accept="image/*" onchange="processarImagem(event)">
+            <button type="button" onclick="usarCamera()">Usar Câmera</button>
+            <video id="video" style="display: none; width: 100%; max-width: 300px;"></video>
+            <canvas id="canvas" style="display: none;"></canvas>
+            <button type="submit">Cadastrar</button>
+        </form>
+        <div id="mensagemCadastro" class="mensagem"></div>
+    </section>
+
+    <!-- Seção de Estoque -->
+    <section id="estoque">
+        <h2>Estoque</h2>
+        <div id="estoqueCards"></div>
+        <div id="modalDetalhes" class="modal">
+            <div class="modal-content">
+                <img id="detalhesImagem" src="" alt="Produto">
+                <h3 id="detalhesNome"></h3>
+                <div class="detalhes-row">
+                    <p>Estoque Mínimo: <span id="detalhesEstoqueMinimo"></span></p>
+                    <p>Quantidade: <span id="detalhesQuantidade"></span></p>
+                </div>
+                <p id="detalhesDescricao"></p>
+                <input type="number" id="quantidadeBaixa" min="1" placeholder="Quantidade a baixar">
+                <button onclick="darBaixa()">VENDA 💰</button>
+                <input type="number" id="quantidadeAdicionar" min="1" placeholder="Quantidade a adicionar">
+                <button onclick="acrescentarQuantidade()">ACRESCENTAR ➕</button>
+                <button class="edit-button" onclick="editarProduto()">Editar</button>
+                <button class="delete-button" onclick="excluirProduto()">Excluir</button>
+                <button class="close" onclick="fecharModal()">×</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção de Histórico -->
+    <section id="historico">
+        <h2>Histórico</h2>
+        <button id="limparHistorico" onclick="limparHistorico()">Limpar Histórico</button>
+        <table id="tabelaHistorico">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Quantidade</th>
+                    <th>Preço Unitário</th>
+                    <th>Data</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody id="corpoHistorico"></tbody>
+        </table>
+        <button id="abrirCompleto" onclick="abrirHistoricoCompleto()">Abrir Completo</button>
+        <div class="estoque-detalhes">
+            <h3>Produtos em Estoque</h3>
+            <ul id="produtosEstoque"></ul>
+        </div>
+        <div class="estoque-total">
+            <h3>Valor Total em Estoque</h3>
+            <p id="valorTotalEstoque">R$ 0,00</p>
+        </div>
+    </section>
+
+    <script>
+        let produtoSelecionadoIndex = -1;
+        let historicoCompleto = false;
+
+        // Função para mostrar/esconder seções
+        function mostrarSecao(secaoId) {
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(secaoId).classList.add('active');
+            document.getElementById('menu').style.display = 'block';
+        }
+
+        // Toggle menu para mobile
+        function toggleMenu() {
+            const nav = document.getElementById('menu');
+            if (nav.className === 'responsive') {
+                nav.className = '';
+            } else {
+                nav.className = 'responsive';
+            }
+        }
+
+        // Logout
+        function logout() {
+            mostrarSecao('login');
+            document.getElementById('menu').style.display = 'none';
+            localStorage.removeItem('credenciais');
+        }
+
+        // Salvar credenciais com checkbox
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const saveUsername = document.getElementById('saveUsername').checked;
+            if (username && password) {
+                if (saveUsername) {
+                    const credenciais = { username: username, password: '' };
+                    localStorage.setItem('credenciais', JSON.stringify(credenciais));
+                }
+                mostrarSecao('estoque');
+                document.getElementById('loginForm').reset();
+                document.getElementById('saveUsername').checked = false;
+            } else {
+                alert('Preencha usuário e senha!');
+            }
+        });
+
+        // Preencher campos com credenciais salvas
+        window.addEventListener('load', function() {
+            const credenciais = JSON.parse(localStorage.getItem('credenciais')) || {};
+            if (credenciais.username) document.getElementById('username').value = credenciais.username;
+        });
+
+        // Formatando preço com ",00"
+        function formatarPreco(input) {
+            let value = input.value.replace(',', '.');
+            if (value === '' || isNaN(value)) {
+                input.value = '';
+                return;
+            }
+            // Permite digitação e formata ao sair do campo
+        }
+
+        // Processar imagem da galeria
+        function processarImagem(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const img = new Image();
+                    img.onload = function() {
+                        canvas.width = 300;
+                        canvas.height = 300;
+                        ctx.drawImage(img, 0, 0, 300, 300);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Processar imagem para edição
+        function processarImagemEdicao(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const img = new Image();
+                    img.onload = function() {
+                        canvas.width = 200;
+                        canvas.height = 200;
+                        ctx.drawImage(img, 0, 0, 200, 200);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Cadastro de produtos
+        document.getElementById('cadastroForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const preco = document.getElementById('preco').value.replace(',', '.');
+            if (isNaN(parseFloat(preco)) || preco === '') {
+                alert('Por favor, insira um preço válido!');
+                return;
+            }
+            const produto = {
+                nome: document.getElementById('nome').value,
+                preco: parseFloat(preco),
+                quantidade: parseInt(document.getElementById('quantidade').value),
+                estoqueMinimo: parseInt(document.getElementById('estoqueMinimo').value),
+                descricao: document.getElementById('descricao').value,
+                imagem: document.getElementById('canvas').toDataURL('image/png') || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='
+            };
+            if (produto.quantidade < produto.estoqueMinimo) {
+                alert(`Atenção: Quantidade (${produto.quantidade}) abaixo do estoque mínimo (${produto.estoqueMinimo})!`);
+            }
+            let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            produtos.push(produto);
+            localStorage.setItem('produtos', JSON.stringify(produtos));
+            document.getElementById('mensagemCadastro').textContent = 'Produto cadastrado com sucesso!';
+            document.getElementById('mensagemCadastro').className = 'mensagem sucesso';
+            document.getElementById('cadastroForm').reset();
+            document.getElementById('preco').value = '0,00';
+            document.getElementById('canvas').getContext('2d').clearRect(0, 0, 300, 300);
+            carregarEstoque();
+            calcularValorTotalEstoque();
+            carregarProdutosEstoque();
+            setTimeout(() => document.getElementById('mensagemCadastro').textContent = '', 3000);
+        });
+
+        // Função para usar a câmera
+        function usarCamera() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                document.getElementById('mensagemCadastro').textContent = 'A câmera não é suportada neste dispositivo.';
+                document.getElementById('mensagemCadastro').className = 'mensagem erro';
+                return;
+            }
+            video.style.display = 'block';
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                    setTimeout(() => {
+                        canvas.width = 300;
+                        canvas.height = 300;
+                        canvas.getContext('2d').drawImage(video, 0, 0, 300, 300);
+                        video.srcObject.getTracks().forEach(track => track.stop());
+                        video.style.display = 'none';
+                    }, 2000);
+                })
+                .catch(err => {
+                    document.getElementById('mensagemCadastro').textContent = 'Erro ao acessar a câmera: ' + (err.name === 'NotAllowedError' ? 'Permissão negada. Habilite a câmera nas configurações do Chrome.' : err.message);
+                    document.getElementById('mensagemCadastro').className = 'mensagem erro';
+                });
+        }
+
+        // Carregar estoque com cards
+        function carregarEstoque() {
+            const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            const estoqueCards = document.getElementById('estoqueCards');
+            estoqueCards.innerHTML = '';
+            produtos.forEach((produto, index) => {
+                const card = document.createElement('div');
+                card.className = 'estoque-card';
+                if (produto.quantidade <= produto.estoqueMinimo) {
+                    card.classList.add('baixo-estoque');
+                    alert(`Atenção: Estoque baixo de ${produto.nome}! Quantidade: ${produto.quantidade}`);
+                }
+                card.innerHTML = `
+                    <img src="${produto.imagem}" alt="${produto.nome}" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='">
+                    <p>Qtde: ${produto.quantidade}</p>
+                    <p>Preço: R$${produto.preco.toFixed(2)}</p>
+                `;
+                card.addEventListener('click', () => mostrarDetalhes(index));
+                estoqueCards.appendChild(card);
+            });
+        }
+
+        // Mostrar detalhes em modal
+        function mostrarDetalhes(index) {
+            produtoSelecionadoIndex = index;
+            const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            const produto = produtos[index];
+            const modalContent = document.querySelector('#modalDetalhes .modal-content');
+            modalContent.innerHTML = `
+                <img id="detalhesImagem" src="${produto.imagem}" alt="${produto.nome}" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='">
+                <h3 id="detalhesNome">${produto.nome}</h3>
+                <div class="detalhes-row">
+                    <p>Estoque Mínimo: <span id="detalhesEstoqueMinimo">${produto.estoqueMinimo}</span></p>
+                    <p>Quantidade: <span id="detalhesQuantidade">${produto.quantidade}</span></p>
+                </div>
+                <p id="detalhesDescricao">${produto.descricao}</p>
+                <input type="number" id="quantidadeBaixa" min="1" placeholder="Quantidade a baixar">
+                <button onclick="darBaixa()">VENDA 💰</button>
+                <input type="number" id="quantidadeAdicionar" min="1" placeholder="Quantidade a adicionar">
+                <button onclick="acrescentarQuantidade()">ACRESCENTAR ➕</button>
+                <button class="edit-button" onclick="editarProduto()">Editar</button>
+                <button class="delete-button" onclick="excluirProduto()">Excluir</button>
+                <button class="close" onclick="fecharModal()">×</button>
+            `;
+            document.getElementById('modalDetalhes').style.display = 'block';
+        }
+
+        // Fechar modal
+        function fecharModal() {
+            document.getElementById('modalDetalhes').style.display = 'none';
+        }
+
+        // Dar baixa (venda) com quantidade
+        function darBaixa() {
+            const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            const produto = produtos[produtoSelecionadoIndex];
+            const quantidade = parseInt(document.getElementById('quantidadeBaixa').value) || 0;
+            if (quantidade > 0 && produto.quantidade >= quantidade) {
+                produto.quantidade -= quantidade;
+                localStorage.setItem('produtos', JSON.stringify(produtos));
+                salvarHistorico(produto.nome, quantidade, produto.preco, 'Venda');
+                carregarEstoque();
+                mostrarDetalhes(produtoSelecionadoIndex);
+                calcularValorTotalEstoque();
+                carregarProdutosEstoque();
+                document.getElementById('quantidadeBaixa').value = '';
+                alert('Baixa registrada no histórico!');
+            } else {
+                alert('Quantidade inválida ou insuficiente!');
+            }
+        }
+
+        // Acrescentar quantidade
+        function acrescentarQuantidade() {
+            const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            const quantidade = parseInt(document.getElementById('quantidadeAdicionar').value) || 0;
+            if (quantidade > 0) {
+                const produto = produtos[produtoSelecionadoIndex];
+                produto.quantidade += quantidade;
+                localStorage.setItem('produtos', JSON.stringify(produtos));
+                salvarHistorico(produto.nome, quantidade, produto.preco, 'Acréscimo');
+                carregarEstoque();
+                mostrarDetalhes(produtoSelecionadoIndex);
+                calcularValorTotalEstoque();
+                carregarProdutosEstoque();
+                document.getElementById('quantidadeAdicionar').value = '';
+                alert('Quantidade acrescentada e registrada no histórico!');
+            } else {
+                alert('Insira uma quantidade válida!');
+            }
+        }
+
+        // Editar produto
+        function editarProduto() {
+            const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            const produto = produtos[produtoSelecionadoIndex];
+            const modalContent = document.querySelector('#modalDetalhes .modal-content');
+            modalContent.innerHTML = `
+                <button class="close" onclick="fecharModal()">×</button>
+                <img id="detalhesImagem" src="${produto.imagem}" alt="${produto.nome}" onerror="this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='">
+                <h3>Editar ${produto.nome}</h3>
+                <form id="editarForm">
+                    <input type="text" id="editarNome" value="${produto.nome}" required>
+                    <input type="number" id="editarPreco" value="${produto.preco.toFixed(2).replace('.', ',')}" step="0.01" min="0" required oninput="formatarPreco(this)" onblur="this.value = (parseFloat(this.value) || 0).toFixed(2).replace('.', ',')">
+                    <input type="number" id="editarQuantidade" value="${produto.quantidade}" min="0" required>
+                    <input type="number" id="editarEstoqueMinimo" value="${produto.estoqueMinimo}" min="0" required>
+                    <textarea id="editarDescricao" required>${produto.descricao}</textarea>
+                    <input type="file" id="editarImagem" accept="image/*" onchange="processarImagemEdicao(event)">
+                    <button type="submit">Salvar</button>
+                    <button type="button" onclick="mostrarDetalhes(${produtoSelecionadoIndex})">Cancelar</button>
+                </form>
+            `;
+            document.getElementById('modalDetalhes').style.display = 'block';
+
+            // Adicionar evento ao formulário de edição
+            document.getElementById('editarForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const preco = document.getElementById('editarPreco').value.replace(',', '.');
+                if (isNaN(parseFloat(preco)) || preco === '') {
+                    alert('Por favor, insira um preço válido!');
+                    return;
+                }
+                const produtoAtualizado = {
+                    nome: document.getElementById('editarNome').value,
+                    preco: parseFloat(preco),
+                    quantidade: parseInt(document.getElementById('editarQuantidade').value),
+                    estoqueMinimo: parseInt(document.getElementById('editarEstoqueMinimo').value),
+                    descricao: document.getElementById('editarDescricao').value,
+                    imagem: document.getElementById('canvas').toDataURL('image/png') || produto.imagem
+                };
+                produtos[produtoSelecionadoIndex] = produtoAtualizado;
+                localStorage.setItem('produtos', JSON.stringify(produtos));
+                salvarHistorico(produtoAtualizado.nome, 0, produtoAtualizado.preco, 'Edição');
+                carregarEstoque();
+                calcularValorTotalEstoque();
+                carregarProdutosEstoque();
+                mostrarDetalhes(produtoSelecionadoIndex);
+                alert('Produto editado com sucesso!');
+            }, { once: true });
+        }
+
+        // Excluir produto
+        function excluirProduto() {
+            if (confirm('Tem certeza que deseja excluir este produto?')) {
+                let produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+                produtos.splice(produtoSelecionadoIndex, 1);
+                localStorage.setItem('produtos', JSON.stringify(produtos));
+                salvarHistorico(produtos[produtoSelecionadoIndex]?.nome || 'Produto', 0, 0, 'Exclusão');
+                carregarEstoque();
+                calcularValorTotalEstoque();
+                carregarProdutosEstoque();
+                fecharModal();
+                alert('Produto excluído com sucesso!');
+            }
+        }
+
+        // Salvar e carregar histórico
+        function salvarHistorico(nome, quantidade, preco, acao) {
+            const historico = JSON.parse(localStorage.getItem('historico')) || [];
+            historico.push({
+                nome,
+                quantidade,
+                preco,
+                data: new Date().toLocaleString('pt-BR'),
+                acao
+            });
+            localStorage.setItem('historico', JSON.stringify(historico));
+            carregarHistorico();
+        }
+
+        function carregarHistorico() {
+            const historico = JSON.parse(localStorage.getItem('historico')) || [];
+            const corpoHistorico = document.getElementById('corpoHistorico');
+            corpoHistorico.innerHTML = '';
+            const limite = historicoCompleto ? historico.length : Math.min(5, historico.length);
+            for (let i = limite - 1; i >= 0; i--) {
+                const venda = historico[i];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${venda.nome}</td>
+                    <td>${venda.quantidade || '-'}</td>
+                    <td>R$${venda.preco.toFixed(2)}</td>
+                    <td>${venda.data}</td>
+                    <td>${venda.acao}</td>
+                `;
+                corpoHistorico.appendChild(tr);
+            }
+        }
+
+        function abrirHistoricoCompleto() {
+            historicoCompleto = !historicoCompleto;
+            document.getElementById('abrirCompleto').textContent = historicoCompleto ? 'Fechar Completo' : 'Abrir Completo';
+            carregarHistorico();
+        }
+
+        // Limpar histórico
+        function limparHistorico() {
+            if (confirm('Tem certeza que deseja limpar todo o histórico?')) {
+                localStorage.removeItem('historico');
+                carregarHistorico();
+                alert('Histórico limpo com sucesso!');
+            }
+        }
+
+        // Calcular valor total em estoque
+        function calcularValorTotalEstoque() {
+            const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            const total = produtos.reduce((sum, produto) => sum + (produto.preco * produto.quantidade), 0);
+            document.getElementById('valorTotalEstoque').textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        // Carregar produtos e valores em estoque
+        function carregarProdutosEstoque() {
+            const produtos = JSON.parse(localStorage.getItem('produtos')) || [];
+            const ul = document.getElementById('produtosEstoque');
+            ul.innerHTML = '';
+            produtos.forEach(produto => {
+                const li = document.createElement('li');
+                li.innerHTML = `<strong>${produto.nome}</strong>: R$ ${(produto.preco * produto.quantidade).toFixed(2)}`;
+                ul.appendChild(li);
+            });
+        }
+
+        // Inicializar
+        window.addEventListener('load', function() {
+            carregarEstoque();
+            carregarHistorico();
+            calcularValorTotalEstoque();
+            carregarProdutosEstoque();
+        });
+    </script>
+</body>
+</html>
